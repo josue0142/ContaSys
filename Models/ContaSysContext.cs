@@ -20,6 +20,8 @@ namespace ContaSys.Models
         public virtual DbSet<CuentaContable> CuentaContables { get; set; } = null!;
         public virtual DbSet<Moneda> Moneda { get; set; } = null!;
         public virtual DbSet<TipoCuenta> TipoCuenta { get; set; } = null!;
+        public virtual DbSet<AsientoContable> AsientoContables { get; set; } = null!;
+        public virtual DbSet<DetalleAsientoContable> DetalleAsientoContables { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -96,6 +98,31 @@ namespace ContaSys.Models
                 entity.Property(e => e.Origen)
                     .HasMaxLength(2)
                     .IsUnicode(false);
+            });
+
+            modelBuilder.Entity<AsientoContable>(entity =>
+            {
+                entity.ToTable("AsientoContable");
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Fecha).HasColumnType("datetime");
+              
+            });
+
+            modelBuilder.Entity<DetalleAsientoContable>(entity =>
+            {
+                entity.ToTable("DetalleAsientoContable");
+
+                entity.Property(e => e.Id).ValueGeneratedOnAdd();
+
+                entity.Property(e => e.Monto).HasColumnType("decimal(18, 2)");
+
+                entity.HasOne(d => d.AsientoContable)
+                    .WithMany(p => p.DetalleAsientoContables)
+                    .HasForeignKey(d => d.AsientoContableId)
+                    .OnDelete(DeleteBehavior.ClientSetNull)
+                    .HasConstraintName("FK_DetalleAsientoContable_AsientoContable");
             });
 
             OnModelCreatingPartial(modelBuilder);
