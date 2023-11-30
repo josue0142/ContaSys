@@ -6,7 +6,6 @@ using ContaSys.Utilities;
 using ContaSys.Intefaces;
 using ContaSys.Controllers;
 using System.Runtime.ConstrainedExecution;
-using Force.DeepCloner;
 
 namespace ContaSys.Services
 {

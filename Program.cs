@@ -1,3 +1,4 @@
+using ContaSys.Auth;
 using ContaSys.Intefaces;
 using ContaSys.Models;
 using ContaSys.Services;
@@ -43,6 +44,8 @@ app.UseSwagger();
 app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
+
+app.UseMiddleware<ApiKeyAuthMiddleware>();
 
 app.UseAuthorization();
 
