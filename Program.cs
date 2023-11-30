@@ -3,6 +3,7 @@ using ContaSys.Intefaces;
 using ContaSys.Models;
 using ContaSys.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using System.Configuration;
 using System.Text.Json.Serialization;
 
@@ -27,7 +28,34 @@ builder.Services.AddCors(options =>
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    // ... Otras configuraciones de Swagger
+
+    c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.ApiKey,
+        In = ParameterLocation.Header,
+        Name = AuthConstants.ApiKeyHeaderName,
+        Description = "Ingrese su API Key para acceder a los endpoints protegidos."
+    });
+
+    c.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "ApiKey"
+                }
+            },
+            new string[] { }
+        }
+    });
+});
+
 
 var app = builder.Build();
 
