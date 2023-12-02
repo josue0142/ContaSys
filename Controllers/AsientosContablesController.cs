@@ -91,6 +91,40 @@ namespace ContaSys.Controllers
                 return Conflict(result);
             }
         }
+
+        [HttpGet]
+        [ProducesResponseType(typeof(APIResponse<List<AsientoContable>>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<IEnumerable<AsientoContable>>> GetAsientosContables(
+            [FromQuery] DateTime? fechaDesde = null,
+            [FromQuery] DateTime? fechaHasta = null,
+            [FromQuery] int? idAuxiliar = null)
+        {
+            IQueryable<AsientoContable> query = _context.AsientoContables.Include(a => a.DetalleAsientoContables);
+
+            if (fechaDesde.HasValue)
+            {
+                query = query.Where(a => a.Fecha.Date >= fechaDesde.Value.Date);
+            }
+
+            if (fechaHasta.HasValue)
+            {
+                query = query.Where(a => a.Fecha.Date <= fechaHasta.Value.Date);
+            }
+
+            if (idAuxiliar.HasValue)
+            {
+                query = query.Where(a => a.AuxiliarId == idAuxiliar.Value);
+            }
+
+            var asientosContables = await query.ToListAsync();
+
+            return Ok(new APIResponse<List<AsientoContable>>
+            {
+                data = asientosContables
+            });
+        }
+
+
     }
 
 
