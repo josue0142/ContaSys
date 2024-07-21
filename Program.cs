@@ -11,7 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<ContaSysContext>();
+builder.Services.AddHttpClient();
 builder.Services.AddScoped<IAsientoContableService, AsientoContableService>();
+builder.Services.AddScoped<ITasaCambiariaService, TasaCambiariaService>();
 
 builder.Services.AddControllers()
             .AddJsonOptions(options =>
@@ -37,7 +39,7 @@ builder.Services.AddSwaggerGen(c =>
         Type = SecuritySchemeType.ApiKey,
         In = ParameterLocation.Header,
         Name = AuthConstants.ApiKeyHeaderName,
-        Description = "Ingrese su API Key para acceder a los endpoints protegidos."
+        Description = "Ingrese el siguiente API Key para acceder a los endpoints protegidos: fhhfjjppppf6666."
     });
 
     c.AddSecurityRequirement(new OpenApiSecurityRequirement

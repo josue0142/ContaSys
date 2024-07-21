@@ -18,11 +18,16 @@ namespace ContaSys.Controllers
     {
         private readonly ContaSysContext _context;
         private readonly IAsientoContableService _asientoContableService;
+        private readonly ITasaCambiariaService _tasaCambiariaService;
 
-        public AsientosContablesController(ContaSysContext context, IAsientoContableService asientoContableService)
+        public AsientosContablesController(ContaSysContext context, 
+            IAsientoContableService asientoContableService,
+            ITasaCambiariaService tasaCambiariaService
+            )
         {
             _context = context;
             _asientoContableService = asientoContableService;
+            _tasaCambiariaService = tasaCambiariaService;
         }
 
         [HttpPost("InsertarAsientoContable")]
@@ -64,6 +69,25 @@ namespace ContaSys.Controllers
                 });
             }
 
+            //Convertir monto por tasa de WS
+            if(request.IdMonedaWS != 0 || request.IdMonedaWS != null)
+            {
+                var tasas = _tasaCambiariaService.ObtenerTasasCambiarias().Result;
+                if (tasas.Any()) 
+                {
+                    var tasa = tasas.FirstOrDefault(field=>field.Id ==  request.IdMonedaWS);
+
+                    if (tasa != null) {
+
+                        foreach (var item in request.Cuentas)
+                        {
+                            item.Monto = item.Monto * tasa.Tasa;
+                        }
+
+                    }
+                }
+            }
+
             // Crear el asiento contable y asociar los detalles
             var nuevoAsientoContable = new AsientoContable
             {
@@ -71,6 +95,7 @@ namespace ContaSys.Controllers
                 Descripcion = request.Descripcion,
                 Estado = "R", //Valor por defecto R
                 AuxiliarId = request.IdAuxiliar,
+                IdMonedaWS = request.IdMonedaWS,
                 DetalleAsientoContables = request.Cuentas.Select(d => new DetalleAsientoContable
                 {
                     CuentaContableId = d.IdCuentaContable,
@@ -97,7 +122,8 @@ namespace ContaSys.Controllers
         public async Task<ActionResult<IEnumerable<AsientoContable>>> GetAsientosContables(
             [FromQuery] DateTime? fechaDesde = null,
             [FromQuery] DateTime? fechaHasta = null,
-            [FromQuery] int? idAuxiliar = null)
+            [FromQuery] int? idAuxiliar = null,
+            [FromQuery] int? idAsiento = null)
         {
             IQueryable<AsientoContable> query = _context.AsientoContables.Include(a => a.DetalleAsientoContables);
 
@@ -114,6 +140,11 @@ namespace ContaSys.Controllers
             if (idAuxiliar.HasValue)
             {
                 query = query.Where(a => a.AuxiliarId == idAuxiliar.Value);
+            }
+
+            if (idAsiento.HasValue)
+            {
+                query = query.Where(a => a.Id == idAsiento.Value);
             }
 
             var asientosContables = await query.ToListAsync();

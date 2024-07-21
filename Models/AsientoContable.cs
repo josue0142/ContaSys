@@ -15,6 +15,7 @@ namespace ContaSys.Models
         public string Descripcion { get; set; } = null!;
         public string Estado { get; set; } = null!;
         public int? AuxiliarId { get; set; }
+        public int? IdMonedaWS { get; set; }
 
         public virtual ICollection<DetalleAsientoContable> DetalleAsientoContables { get; set; }
     }

@@ -1,5 +1,5 @@
 -- Insertar datos en la tabla TipoCuenta
-INSERT INTO TipoCuenta (Id, Descripcion, Origen)
+INSERT INTO TipoCuenta (Id, Descripcion, Origen, Estado)
 VALUES
 (1, 'Activos', 'DB',1),
 (2, 'Pasivos', 'CR',1),
